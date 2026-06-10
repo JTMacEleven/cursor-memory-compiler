@@ -1,0 +1,40 @@
+---
+description: Personal knowledge base compiled from Cursor conversations. Use AGENTS.md schema for compile, query, and memory maintenance.
+alwaysApply: true
+---
+
+# Knowledge Base
+
+This project maintains a compounding knowledge base from Cursor AI sessions.
+
+## Reference
+
+- Read [AGENTS.md](AGENTS.md) for the full compiler specification.
+- Read [knowledge/index.md](knowledge/index.md) first when answering questions about past decisions or patterns.
+- Daily logs: `daily/YYYY-MM-DD.md`
+
+## Consult the knowledge base
+
+1. Read `knowledge/index.md`
+2. Select 3–10 relevant articles
+3. Read those articles in full
+4. Synthesize with `[[wikilink]]` citations
+
+## Compile (on request)
+
+When asked to compile memory or daily logs:
+1. Read `daily/*.md` and `knowledge/index.md`
+2. Update `knowledge/concepts/`, `connections/`, `qa/` per AGENTS.md
+3. Update `knowledge/index.md` and `knowledge/log.md`
+4. Record compile in `scripts/state.json` ingested map with file hash
+
+## Memory maintenance (from hooks)
+
+When prompted by memory maintenance follow-up:
+- Read `scripts/flush-context-*.md` if present
+- Append structured entries to `daily/YYYY-MM-DD.md` per AGENTS.md
+- Delete flush-context file when done
+
+## Lint
+
+`python -m uv run python scripts/lint.py --structural-only`

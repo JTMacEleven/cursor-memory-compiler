@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "python -m uv run python hooks/session-start.py",
+        "timeout": 15
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "python -m uv run python hooks/session-end.py",
+        "timeout": 10
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "python -m uv run python hooks/pre-compact.py",
+        "timeout": 10
+      }
+    ],
+    "stop": [
+      {
+        "command": "python -m uv run python hooks/stop-memory.py",
+        "loop_limit": 1,
+        "timeout": 5
+      }
+    ]
+  }
+}

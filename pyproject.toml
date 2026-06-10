@@ -1,0 +1,12 @@
+[project]
+name = "cursor-memory-compiler"
+version = "1.0.0"
+description = "Personal knowledge base for Cursor AI — hooks capture sessions, agent compiles knowledge"
+requires-python = ">=3.12"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "tzdata>=2024.1",
+]
+
+[tool.ruff]
+line-length = 100

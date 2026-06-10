@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Runtime state
+scripts/state.json
+scripts/last-flush.json
+scripts/flush.log
+scripts/compile.log
+scripts/flush-context-*
+scripts/compile-pending.flag
+
+# Generated content (built by hooks and agent)
+daily/*
+!daily/.gitkeep
+knowledge/concepts/*
+!knowledge/concepts/.gitkeep
+knowledge/connections/*
+!knowledge/connections/.gitkeep
+knowledge/qa/*
+!knowledge/qa/.gitkeep
+
+# Reports
+reports/
+
+# OS
+.DS_Store
+Thumbs.db
