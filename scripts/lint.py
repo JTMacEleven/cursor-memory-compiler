@@ -12,6 +12,13 @@ import argparse
 from pathlib import Path
 
 from config import KNOWLEDGE_DIR, REPORTS_DIR, now_iso, today_iso
+from importance import (
+    IMPORTANCE_LEVELS,
+    effective_importance,
+    get_article_expires,
+    get_article_importance,
+    parse_frontmatter,
+)
 from utils import (
     count_inbound_links,
     extract_wikilinks,
@@ -112,6 +119,60 @@ def check_missing_backlinks() -> list[dict]:
     return issues
 
 
+def check_missing_importance() -> list[dict]:
+    issues = []
+    for article in list_wiki_articles():
+        meta = parse_frontmatter(article.read_text(encoding="utf-8"))
+        if "importance" not in meta:
+            rel = article.relative_to(KNOWLEDGE_DIR)
+            issues.append({
+                "severity": "warning",
+                "check": "missing_importance",
+                "file": str(rel),
+                "detail": "Missing importance frontmatter (default: useful)",
+            })
+    return issues
+
+
+def check_invalid_importance() -> list[dict]:
+    issues = []
+    for article in list_wiki_articles():
+        level = get_article_importance(article)
+        meta = parse_frontmatter(article.read_text(encoding="utf-8"))
+        if "importance" in meta and meta["importance"].lower() not in IMPORTANCE_LEVELS:
+            rel = article.relative_to(KNOWLEDGE_DIR)
+            issues.append({
+                "severity": "error",
+                "check": "invalid_importance",
+                "file": str(rel),
+                "detail": f"Invalid importance: {meta['importance']}",
+            })
+    return issues
+
+
+def check_temporary_expiry() -> list[dict]:
+    issues = []
+    for article in list_wiki_articles():
+        level = get_article_importance(article)
+        rel = article.relative_to(KNOWLEDGE_DIR)
+        if level == "temporary" and not get_article_expires(article):
+            issues.append({
+                "severity": "warning",
+                "check": "temporary_no_expires",
+                "file": str(rel),
+                "detail": "Temporary article missing expires: YYYY-MM-DD",
+            })
+        effective = effective_importance(article)
+        if level == "temporary" and effective == "expired":
+            issues.append({
+                "severity": "warning",
+                "check": "temporary_expired",
+                "file": str(rel),
+                "detail": "Past expiry — recompile as importance: expired",
+            })
+    return issues
+
+
 def check_sparse_articles() -> list[dict]:
     issues = []
     for article in list_wiki_articles():
@@ -162,6 +223,9 @@ def main():
 
     for name, fn in [
         ("Broken links", check_broken_links),
+        ("Missing importance", check_missing_importance),
+        ("Invalid importance", check_invalid_importance),
+        ("Temporary expiry", check_temporary_expiry),
         ("Orphan pages", check_orphan_pages),
         ("Orphan sources", check_orphan_sources),
         ("Stale articles", check_stale_articles),

@@ -41,7 +41,11 @@ def wiki_article_exists(link: str) -> bool:
 def read_wiki_index() -> str:
     if INDEX_FILE.exists():
         return INDEX_FILE.read_text(encoding="utf-8")
-    return "# Knowledge Base Index\n\n| Article | Summary | Compiled From | Updated |\n|---------|---------|---------------|---------|"
+    return (
+        "# Knowledge Base Index\n\n"
+        "| Article | Importance | Summary | Compiled From | Updated |\n"
+        "|---------|------------|---------|---------------|---------|"
+    )
 
 
 def read_all_wiki_content() -> str:

@@ -27,6 +27,27 @@ Open in Cursor → **Settings → Hooks** → confirm 4 hooks.
 
 ---
 
+## Memory importance scoring
+
+Every session and article is scored so critical knowledge surfaces first.
+
+| Level | Meaning |
+|-------|---------|
+| **Critical** | Architecture, security, breaking rules — never forget |
+| **Important** | Conventions, durable project decisions |
+| **Useful** | Helpful tips (default) |
+| **Temporary** | Time-bound — add `expires: YYYY-MM-DD` |
+| **Expired** | Superseded or past expiry — archived |
+
+Daily logs include `**Importance:** Important` at the top of each session entry.  
+Articles include `importance: useful` in YAML frontmatter.
+
+`sessionStart` injects Critical → Important → Useful first; Expired articles are excluded.
+
+Ask: *"Review expired and temporary articles per AGENTS.md"*
+
+---
+
 ## Automatic
 
 | Hook | What happens |

@@ -43,6 +43,7 @@ Cursor Agent chat
 | Compiler | Cursor Agent + AGENTS.md | Extracts and organizes knowledge |
 | Executable | `knowledge/` | Structured, queryable articles |
 | Lint | `scripts/lint.py` | Structural health checks (free) |
+| Scoring | `importance` field | Critical → Important → Useful → Temporary → Expired |
 
 ## Key commands
 

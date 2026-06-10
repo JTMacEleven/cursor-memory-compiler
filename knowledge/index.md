@@ -1,4 +1,4 @@
 # Knowledge Base Index
 
-| Article | Summary | Compiled From | Updated |
-|---------|---------|---------------|---------|
+| Article | Importance | Summary | Compiled From | Updated |
+|---------|------------|---------|---------------|---------|

@@ -40,6 +40,8 @@ Each file follows this format:
 
 ### Session (HH:MM) - Brief Title
 
+**Importance:** Critical | Important | Useful | Temporary (expires YYYY-MM-DD)
+
 **Context:** What the user was working on.
 
 **Key Exchanges:**
@@ -90,10 +92,10 @@ Format:
 ```markdown
 # Knowledge Base Index
 
-| Article | Summary | Compiled From | Updated |
-|---------|---------|---------------|---------|
-| [[concepts/supabase-auth]] | Row-level security patterns and JWT gotchas | daily/2026-04-02.md | 2026-04-02 |
-| [[connections/auth-and-webhooks]] | Token verification patterns shared across Supabase auth and Stripe webhooks | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
+| Article | Importance | Summary | Compiled From | Updated |
+|---------|------------|---------|---------------|---------|
+| [[concepts/supabase-auth]] | Critical | Row-level security patterns and JWT gotchas | daily/2026-04-02.md | 2026-04-02 |
+| [[connections/auth-and-webhooks]] | Important | Token verification patterns shared across auth and webhooks | daily/2026-04-02.md, daily/2026-04-04.md | 2026-04-04 |
 ```
 
 ### `knowledge/log.md` - Build Log
@@ -117,6 +119,59 @@ Format:
 
 ---
 
+## Memory Importance Scoring
+
+Every session entry and knowledge article must have an importance level. This controls retrieval priority — `sessionStart` injects Critical and Important memories first and excludes Expired articles from context.
+
+### Levels
+
+| Level | When to use | Examples | Retention |
+|-------|-------------|----------|-----------|
+| **Critical** | Breaking constraints, security, core architecture — wrong info causes real harm | Auth model, deployment invariants, data schema contracts | Permanent |
+| **Important** | Project conventions and durable decisions | Stack choices, naming patterns, CI/CD setup, API design | Permanent |
+| **Useful** | Helpful context, tips, non-obvious lessons | Debugging tricks, tool quirks, workflow preferences | Long-lived (default) |
+| **Temporary** | Valid now but will age out | Sprint context, WIP decisions, time-bound workarounds | Set `expires: YYYY-MM-DD` |
+| **Expired** | Superseded, wrong, or past expiry — kept for audit only | Old approach replaced, temporary past deadline | Archived |
+
+### Scoring rules
+
+1. **Default to Useful** when uncertain.
+2. **Critical** sparingly — only for knowledge that must never be forgotten or violated.
+3. **Temporary** must include `expires` in article frontmatter or `(expires YYYY-MM-DD)` in daily log Importance line.
+4. When a Temporary article passes its expiry date, recompile as **Expired** (or delete if truly worthless).
+5. When updating an article with contradictory info, mark the old version **Expired** and create/update the replacement at Critical/Important/Useful as appropriate.
+6. Index table must include the Importance column for every article.
+
+### Daily log format
+
+```markdown
+**Importance:** Important
+
+**Context:** ...
+```
+
+For temporary session knowledge:
+
+```markdown
+**Importance:** Temporary (expires 2026-07-01)
+```
+
+### Article frontmatter
+
+Add `importance` to every article:
+
+```yaml
+---
+title: "Concept Name"
+importance: important
+expires: 2026-07-01   # required only when importance is temporary
+---
+```
+
+Valid values: `critical`, `important`, `useful`, `temporary`, `expired`
+
+---
+
 ## Article Formats
 
 ### Concept Articles (`knowledge/concepts/`)
@@ -126,6 +181,7 @@ One article per atomic piece of knowledge. These are facts, patterns, decisions,
 ```markdown
 ---
 title: "Concept Name"
+importance: useful
 aliases: [alternate-name, abbreviation]
 tags: [domain, topic]
 sources:
@@ -282,7 +338,7 @@ Output: a markdown report with severity levels (error, warning, suggestion).
 - **Writing style:** Encyclopedia-style, factual, third-person where appropriate
 - **Dates:** ISO 8601 (YYYY-MM-DD for dates, full ISO for timestamps in log.md)
 - **File naming:** lowercase, hyphens for spaces (e.g., `supabase-row-level-security.md`)
-- **Frontmatter:** Every article must have YAML frontmatter with at minimum: title, sources, created, updated
+- **Frontmatter:** Every article must have YAML frontmatter with at minimum: title, importance, sources, created, updated
 - **Sources:** Always link back to the daily log(s) that contributed to an article
 
 ---

@@ -1,8 +1,10 @@
 """
 SessionStart hook - injects knowledge base context into every Cursor conversation.
+Prioritizes Critical and Important memories in the injected index.
 """
 
 import json
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -10,6 +12,11 @@ ROOT = Path(__file__).resolve().parent.parent
 KNOWLEDGE_DIR = ROOT / "knowledge"
 DAILY_DIR = ROOT / "daily"
 INDEX_FILE = KNOWLEDGE_DIR / "index.md"
+SCRIPTS_DIR = ROOT / "scripts"
+
+sys.path.insert(0, str(SCRIPTS_DIR))
+from importance import build_importance_summary, sort_index_content  # noqa: E402
+from utils import list_wiki_articles  # noqa: E402
 
 MAX_CONTEXT_CHARS = 20_000
 MAX_LOG_LINES = 30
@@ -32,11 +39,21 @@ def build_context() -> str:
     today = datetime.now(timezone.utc).astimezone()
     parts.append(f"## Today\n{today.strftime('%A, %B %d, %Y')}")
 
+    articles = list_wiki_articles()
+    if articles:
+        parts.append(build_importance_summary(articles))
+
     if INDEX_FILE.exists():
-        parts.append(f"## Knowledge Base Index\n\n{INDEX_FILE.read_text(encoding='utf-8')}")
+        index = sort_index_content(INDEX_FILE.read_text(encoding="utf-8"), include_expired=False)
+        parts.append(f"## Knowledge Base Index (by priority)\n\n{index}")
     else:
         parts.append("## Knowledge Base Index\n\n(empty - no articles compiled yet)")
 
+    parts.append(
+        "## Importance Levels\n"
+        "Critical > Important > Useful > Temporary > Expired. "
+        "See AGENTS.md for scoring rules."
+    )
     parts.append(f"## Recent Daily Log\n\n{get_recent_log()}")
     context = "\n\n---\n\n".join(parts)
 

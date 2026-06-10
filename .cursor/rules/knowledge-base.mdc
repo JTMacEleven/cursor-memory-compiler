@@ -20,12 +20,24 @@ This project maintains a compounding knowledge base from Cursor AI sessions.
 3. Read those articles in full
 4. Synthesize with `[[wikilink]]` citations
 
+## Memory importance scoring
+
+Every session and article must have an importance level: **Critical**, **Important**, **Useful**, **Temporary**, or **Expired**.
+
+- **Critical** — architecture, security, breaking constraints (permanent)
+- **Important** — conventions, durable decisions (permanent)
+- **Useful** — helpful tips (default)
+- **Temporary** — time-bound; requires `expires: YYYY-MM-DD`
+- **Expired** — superseded or past expiry; archive only
+
+When compiling or maintaining memory, assign `importance` in article frontmatter and `**Importance:**` in daily logs per AGENTS.md.
+
 ## Compile (on request)
 
 When asked to compile memory or daily logs:
 1. Read `daily/*.md` and `knowledge/index.md`
-2. Update `knowledge/concepts/`, `connections/`, `qa/` per AGENTS.md
-3. Update `knowledge/index.md` and `knowledge/log.md`
+2. Update `knowledge/concepts/`, `connections/`, `qa/` per AGENTS.md with `importance` frontmatter
+3. Update `knowledge/index.md` (include Importance column) and `knowledge/log.md`
 4. Record compile in `scripts/state.json` ingested map with file hash
 
 ## Memory maintenance (from hooks)
